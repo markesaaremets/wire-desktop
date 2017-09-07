@@ -29,6 +29,8 @@ webFrame.setZoomLevelLimits(1, 1);
 webFrame.registerURLSchemeAsBypassingCSP('file');
 
 function subscribeToWebappEvents() {
+  amplify.subscribe('download-url', (url) => ipcRenderer.sendToHost('download-url', url));
+  
   amplify.subscribe(z.event.WebApp.SYSTEM_NOTIFICATION.CLICK, () => {
     ipcRenderer.send('notification-click');
     ipcRenderer.sendToHost('notification-click');

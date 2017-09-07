@@ -69,7 +69,12 @@ class Webview extends Component {
   }
 
   _onIpcMessage(event) {
-    this.props.onIpcMessage(event);
+    const {channel, args} = event;
+    if (channel === 'download-url') {
+      this._onDownloadUrl(args[0]);
+    } else {
+      this.props.onIpcMessage(event);
+    }
   }
 
   _focusWebview() {
