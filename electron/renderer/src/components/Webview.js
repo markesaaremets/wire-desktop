@@ -38,8 +38,13 @@ class Webview extends Component {
     this.webview.partition = partition ? `persist:${partition}` : '';
     this.webview.src = src;
 
-    this.webview.addEventListener('page-title-updated', this._onPageTitleUpdated);
+    this.webview.addEventListener('did-finish-load', () => {
+      this.webview.getWebContents().session.on('will-download', (event, item) => {
+        console.log('name', item.getFilename());
+      });
+    });
     this.webview.addEventListener('ipc-message', this._onIpcMessage);
+    this.webview.addEventListener('page-title-updated', this._onPageTitleUpdated);
 
     this._focusWebview();
   }
