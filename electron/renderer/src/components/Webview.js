@@ -60,6 +60,10 @@ class Webview extends Component {
     return this.props.visible !== nextProps.visible;
   }
 
+  _onDownloadUrl(url) {
+    this.webview.getWebContents().downloadURL(url);
+  }
+
   _onPageTitleUpdated(event) {
     this.props.onPageTitleUpdated(event);
   }
