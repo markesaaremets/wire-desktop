@@ -18,7 +18,7 @@
  */
 
 // Modules
-const {app, BrowserWindow, ipcMain, Menu, shell} = require('electron');
+const {app, BrowserWindow, dialog, ipcMain, Menu, shell} = require('electron');
 const fs = require('fs');
 const minimist = require('minimist');
 const path = require('path');
@@ -237,6 +237,29 @@ function showMainWindow() {
       // Enable <webview>
       webviewTag: true,
     },
+  });
+  
+  main.webContents.session.on('will-download', function onDownload(event, item) {
+    let defaultFilename = item.getFilename();
+    
+    const options = {
+      defaultPath: path.basename('sample.ext')
+    };
+    
+    let filename = dialog.showSaveDialog(main, options);
+    
+    if (!filename) {
+      item.cancel();
+    } else {
+      const savePathObject = path.parse(filename);
+      savePathObject.base = null;
+      savePathObject.ext = savePathObject.ext || path.extname(defaultFilename);
+      item.setSavePath(path.format(savePathObject));
+    }
+  });
+  
+  ipcMain.on('download-url', (event, arg) => {
+    main.webContents.downloadURL(arg[0]);
   });
 
   if (settings.restore('fullscreen', false)) {

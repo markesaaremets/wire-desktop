@@ -38,11 +38,6 @@ class Webview extends Component {
     this.webview.partition = partition ? `persist:${partition}` : '';
     this.webview.src = src;
 
-    this.webview.addEventListener('did-finish-load', () => {
-      this.webview.getWebContents().session.on('will-download', (event, item) => {
-        console.log('name', item.getFilename());
-      });
-    });
     this.webview.addEventListener('ipc-message', this._onIpcMessage);
     this.webview.addEventListener('page-title-updated', this._onPageTitleUpdated);
 
@@ -60,21 +55,12 @@ class Webview extends Component {
     return this.props.visible !== nextProps.visible;
   }
 
-  _onDownloadUrl(url) {
-    this.webview.getWebContents().downloadURL(url);
-  }
-
   _onPageTitleUpdated(event) {
     this.props.onPageTitleUpdated(event);
   }
 
   _onIpcMessage(event) {
-    const {channel, args} = event;
-    if (channel === 'download-url') {
-      this._onDownloadUrl(args[0]);
-    } else {
-      this.props.onIpcMessage(event);
-    }
+    this.props.onIpcMessage(event);
   }
 
   _focusWebview() {
