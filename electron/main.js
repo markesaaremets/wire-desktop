@@ -238,16 +238,17 @@ function showMainWindow() {
       webviewTag: true,
     },
   });
-  
+
   main.webContents.session.on('will-download', function onDownload(event, item) {
+    event.preventDefault();
     let defaultFilename = item.getFilename();
-    
+
     const options = {
       defaultPath: path.basename('sample.ext')
     };
-    
+
     let filename = dialog.showSaveDialog(main, options);
-    
+
     if (!filename) {
       item.cancel();
     } else {
@@ -257,7 +258,7 @@ function showMainWindow() {
       item.setSavePath(path.format(savePathObject));
     }
   });
-  
+
   ipcMain.on('download-url', (event, arg) => {
     main.webContents.downloadURL(arg[0]);
   });
