@@ -17,7 +17,7 @@
  *
  */
 
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 
 const {desktopCapturer, ipcRenderer, remote, webFrame} = require('electron');
@@ -165,26 +165,15 @@ function replaceGoogleAuth() {
 }
 
 function enableFileLogging() {
-  // webapp uses winston reference to define log level
+  // webapp uses global winston reference to define log level
   global.winston = require('winston');
 
   const id = new URL(window.location).searchParams.get('id');
   const logName = require('../../js/config').CONSOLE_LOG;
-  const logDirectory = path.join(app.getPath('userData'), 'logs');
 
   try {
-    if (!fs.existsSync(logDirectory)) {
-      fs.mkdirSync(logDirectory);
-    }
-
-    const subDirectory = path.join(logDirectory, id);
-
-    if (!fs.existsSync(subDirectory)) {
-      fs.mkdirSync(subDirectory);
-    }
-
-    const logFilePath = path.join(subDirectory, logName);
-
+    const logFilePath = path.join(app.getPath('userData'), 'logs', id, logName);
+    fs.createFileSync(logFilePath);
     console.log(`Logging into file: ${logFilePath}`);
 
     winston
@@ -194,7 +183,6 @@ function enableFileLogging() {
       })
       .remove(winston.transports.Console)
       .info(pkg.productName, 'Version', pkg.version);
-
   } catch (error) {
     console.warn(`Failed to create log file: ${error.message}`);
   }
