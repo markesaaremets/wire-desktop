@@ -19,7 +19,7 @@
 
 // Modules
 const {app, BrowserWindow, dialog, ipcMain, Menu, shell} = require('electron');
-const fs = require('fs');
+const fs = require('fs-extra');
 const minimist = require('minimist');
 const path = require('path');
 const raygun = require('raygun');
@@ -58,6 +58,21 @@ const windowManager = require('./js/window-manager');
 // Config
 const argv = minimist(process.argv.slice(1));
 const config = require('./js/config');
+
+// Logger
+global.winston = require('winston');
+const logFileName = path.join(app.getPath('userData'), 'logs', 'electron.log');
+fs.createFileSync(logFileName);
+const logger = new (winston.Logger)({
+  transports: [
+    new winston.transports.File({filename: logFileName})
+  ],
+  exceptionHandlers: [
+    new winston.transports.File({filename: logFileName})
+  ]
+});
+
+logger.info('Hello from Benny!');
 
 // Icon
 const ICON = `wire.${((process.platform === 'win32') ? 'ico' : 'png')}`;
@@ -260,6 +275,7 @@ function showMainWindow() {
   });
 
   ipcMain.on('download-url', (event, arg) => {
+    winston.log('HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEELLO');
     main.webContents.downloadURL(arg[0]);
   });
 
@@ -376,7 +392,7 @@ function showAboutWindow() {
 
 function discloseWindowID(browserWindow) {
   windowManager.setPrimaryWindowId(browserWindow.id);
-};
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // APP Events
